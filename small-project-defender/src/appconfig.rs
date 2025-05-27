@@ -3,21 +3,21 @@ use serde::Deserialize;
 
 #[derive(Debug, Deserialize)]
 pub struct AppConfig {
-    hash_scaner: HashScanerConfig,
-    telegram_bot: BotConfig,
+    pub hash_scaner: HashScanerConfig,
+    pub telegram_bot: BotConfig,
 }
 
 #[derive(Debug,Deserialize)]
 pub struct HashScanerConfig {
-    directories: Vec<String>,
-    exceptions: Vec<String>,
-    cooldown: u64,
+    pub directories: Vec<String>,
+    pub exceptions: Vec<String>,
+    pub cooldown: u64,
 }
 
 #[derive(Debug,Deserialize)]
 pub struct BotConfig {
-    token: String,
-    admin_chat: String,
+    pub token: String,
+    pub admin_chat: String,
 }
 
 impl AppConfig {
