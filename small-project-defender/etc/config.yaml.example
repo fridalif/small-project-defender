@@ -1,0 +1,12 @@
+hash_scaner:
+  directories:
+    - "/path/to/dir1"
+    - "/path/to/dir2"
+  exceptions:
+    - "*.log"
+    - "*.tmp"
+    - "media/*"
+  cooldown: 60
+telegram_bot:
+  token: "your_bot_token_here"
+  admin_chat: "123456789"
