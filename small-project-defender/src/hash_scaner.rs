@@ -1,10 +1,10 @@
-mod appconfig;
-
 use sha2::{Digest, Sha256};
 use std::fs::File;
 use rand::Rng;
 use std::io::prelude::*;
+use std::collections::HashMap;
 use std::path::Path;
+use crate::prelude::*;
 
 fn hash_file(file_path: &str) -> Result<String, std::io::Error> {
     let mut file = File::open(file_path)?;
@@ -47,19 +47,20 @@ pub fn init_origins_hash_scaner(config: appconfig::AppConfig) -> HashMap<String,
     return origins;
 }
 
-pub fn schedule_hash_scaner(origins: HashMap<String, String>, config: appconfig::AppConfig) {
-    let exceptions = config.hash_scaner.exceptions;
+pub fn schedule_hash_scaner(origins: HashMap<String, String>, config: std::sync::Arc<AppConfig>) {
+    let mut exceptions = config.hash_scaner.exceptions.clone();
+    let temp_dirs = config.hash_scaner.directories.clone();
     while true {
         let temp_cooldown = config.hash_scaner.cooldown;
         let random_seconds = rand::thread_rng().gen_range(0..temp_cooldown);
         std::thread::sleep(std::time::Duration::from_secs(random_seconds));
-        let temp_dirs = config.hash_scaner.directories;
-        let new_origins: HashMap<String, String> = HashMap::new();
-        for dir in temp_dirs {
+        
+        let mut new_origins: HashMap<String, String> = HashMap::new();
+        for dir in temp_dirs.iter() {
             (new_origins, exceptions) = scan_directory(origins, &dir, exceptions);    
         }
         for (key, value) in new_origins {
-            if !origins.contains(&key) {
+            if !origins.contains_key(&key) {
                 println!("New file detected: {} with hash: {}", key, value);
                 continue
             }

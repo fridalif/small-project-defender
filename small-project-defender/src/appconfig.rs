@@ -1,4 +1,3 @@
-use config::{Config, File, Environment};
 use serde::Deserialize;
 
 #[derive(Debug, Deserialize)]

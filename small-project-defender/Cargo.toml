@@ -5,6 +5,7 @@ edition = "2024"
 
 [dependencies]
 config = "0.15.11"
+rand = "0.9.1"
 serde = "1.0.219"
 serde_yaml = "0.9.34"
 sha2 = "0.10.9"
