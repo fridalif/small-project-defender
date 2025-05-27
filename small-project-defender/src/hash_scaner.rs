@@ -6,9 +6,9 @@ use std::io::prelude::*;
 use std::path::Path;
 
 fn hash_file(file_path: &str) -> Result<String, std::io::Error> {
-    let mut file = File::open(file_path).unwrap();
+    let mut file = File::open(file_path)?;
     let mut buffer = Vec::new();
-    file.read_to_end(&mut buffer).unwrap();
+    file.read_to_end(&mut buffer)?;
     let hash = Sha256::digest(&buffer);
     Ok(format!("{:x}", hash))
 }
