@@ -4,7 +4,8 @@ hash_scaner:
     - "/path/to/dir1"
     - "/path/to/dir2"
   exceptions:
-    - "media"
+    - "*/etc"
+    - "*/target"
   cooldown: 60
 telegram_bot:
   token: "your_bot_token_here"

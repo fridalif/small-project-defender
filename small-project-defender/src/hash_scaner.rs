@@ -5,6 +5,7 @@ use std::io::prelude::*;
 use std::collections::{HashMap};
 use std::path::Path;
 use crate::prelude::*;
+use glob::Pattern;
 
 fn hash_file(file_path: &str) -> Result<String, std::io::Error> {
     let mut file = File::open(file_path)?;
@@ -14,6 +15,16 @@ fn hash_file(file_path: &str) -> Result<String, std::io::Error> {
     Ok(format!("{:x}", hash))
 }
 
+fn is_exception(path: &str, exceptions: Vec<String>) -> bool {
+    for exception in exceptions {
+        if let Ok(pattern) = Pattern::new(&exception) {
+            if pattern.matches(path) {
+                return true;
+            }
+        }
+    }
+    false
+}
 
 fn scan_directory(hash_map: HashMap<String, String>, path: &str, exceptions: Vec<String>) -> (HashMap<String,String>, Vec<String>) {
     let path_ref = Path::new(path);
@@ -33,8 +44,8 @@ fn scan_directory(hash_map: HashMap<String, String>, path: &str, exceptions: Vec
     for entry in dir {
         let entry = entry.unwrap();
         let path = entry.path();
-        if exceptions.contains(&path.to_str().unwrap().to_string()) || exceptions.contains(&path.file_name().and_then(|name| name.to_str()).unwrap().to_string()) {
-            continue;
+        if is_exception(path.to_str().unwrap(), exceptions.clone()) { 
+            continue; 
         }
         (hash_map, exceptions) = scan_directory(hash_map, &path.to_str().unwrap(), exceptions);    
     }
