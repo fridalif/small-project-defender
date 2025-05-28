@@ -33,7 +33,7 @@ fn scan_directory(hash_map: HashMap<String, String>, path: &str, exceptions: Vec
     for entry in dir {
         let entry = entry.unwrap();
         let path = entry.path();
-        if exceptions.contains(&path.to_str().unwrap().to_string()) {
+        if exceptions.contains(&path.to_str().unwrap().to_string()) || exceptions.contains(&path.file_name().and_then(|name| name.to_str()).unwrap().to_string()) {
             continue;
         }
         (hash_map, exceptions) = scan_directory(hash_map, &path.to_str().unwrap(), exceptions);    
@@ -56,6 +56,7 @@ pub fn schedule_hash_scaner(origins: HashMap<String, String>, config: Arc<AppCon
     let dirs = config.hash_scaner.directories.clone();
     let mut new_hashes = origins.clone();
     loop {
+        println!("Scanning directories...");
         let temp_cooldown = config.hash_scaner.cooldown;
         let random_seconds = rand::random_range(0..temp_cooldown);
         std::thread::sleep(std::time::Duration::from_secs(random_seconds));
