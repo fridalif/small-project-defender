@@ -8,6 +8,7 @@ pub struct AppConfig {
 
 #[derive(Debug,Deserialize)]
 pub struct HashScanerConfig {
+    pub on: bool,
     pub directories: Vec<String>,
     pub exceptions: Vec<String>,
     pub cooldown: u64,

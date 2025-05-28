@@ -1,11 +1,10 @@
 hash_scaner:
+  on: true
   directories:
     - "/path/to/dir1"
     - "/path/to/dir2"
   exceptions:
-    - "*.log"
-    - "*.tmp"
-    - "media/*"
+    - "media"
   cooldown: 60
 telegram_bot:
   token: "your_bot_token_here"
