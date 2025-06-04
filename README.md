@@ -1,4 +1,7 @@
 # Small Project Defender
+
+![Shield Logo Featuring SPD Letters In Dark Blue](https://github.com/user-attachments/assets/44c7da2a-4711-4846-861b-c4399b7491d6)
+
 Программа для защиты небольших проектов, с управлением через Телеграм бота
 
 ### TODO
