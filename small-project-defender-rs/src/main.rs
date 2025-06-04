@@ -1,0 +1,21 @@
+mod appconfig;
+mod hash_scaner;
+mod prelude {
+    pub use crate::appconfig::AppConfig;
+}
+
+use crate::prelude::*;
+use std::sync::Arc;
+fn main() -> Result<(), Box<dyn std::error::Error>>{
+    let config = Arc::new(AppConfig::new("../etc/config.yaml".to_string())?);
+    if config.hash_scaner.on {
+        println!("Hash scaner is on");
+        let origins_hash_scaner = hash_scaner::init_origins_hash_scaner(std::sync::Arc::clone(&config));
+        hash_scaner::schedule_hash_scaner(origins_hash_scaner, std::sync::Arc::clone(&config));
+    }
+    Ok(())  
+}
+
+
+
+
