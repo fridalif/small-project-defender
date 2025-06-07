@@ -67,21 +67,24 @@ pub fn schedule_hash_scaner(origins: HashMap<String, String>, config: Arc<AppCon
     let dirs = config.hash_scaner.directories.clone();
     let mut new_hashes = origins.clone();
     loop {
-        println!("Scanning directories...");
         let temp_cooldown = config.hash_scaner.cooldown;
         let random_seconds = rand::random_range(0..temp_cooldown);
         std::thread::sleep(std::time::Duration::from_secs(random_seconds));
         for dir in dirs.iter() {
             (new_hashes, exceptions) = scan_directory(new_hashes, dir.as_str(), exceptions)
         }
+        let mut response_map = HashMap<String, String>(); 
         for key in new_hashes.keys() {
             if !origins.contains_key(key) {
-                println!("New file found: {}", key);
+                response_map.insert(key.to_string(), format!("Detected new file: {}", new_hashes.get(key).unwrap()));
                 continue;
             }
             if origins.get(key).unwrap() != new_hashes.get(key).unwrap() {
-                println!("File changed: {}", key);
+                response_map.insert(key.to_string(), format!("Detected modified file: {}", new_hashes.get(key).unwrap()));
                 continue;
+            }
+            if len(response_map) != 0 {
+                tx.send(response_map).unwrap();
             }
         }
     }   
