@@ -3,7 +3,6 @@ use serde::Deserialize;
 #[derive(Debug, Deserialize)]
 pub struct AppConfig {
     pub hash_scaner: HashScanerConfig,
-    pub telegram_bot: BotConfig,
 }
 
 #[derive(Debug,Deserialize)]
@@ -14,11 +13,6 @@ pub struct HashScanerConfig {
     pub cooldown: u64,
 }
 
-#[derive(Debug,Deserialize)]
-pub struct BotConfig {
-    pub token: String,
-    pub admin_chat: String,
-}
 
 impl AppConfig {
     pub fn new(path: String) -> Result<Self, Box<dyn std::error::Error>> {

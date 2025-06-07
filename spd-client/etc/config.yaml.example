@@ -7,6 +7,3 @@ hash_scaner:
     - "*/etc"
     - "*/target"
   cooldown: 60
-telegram_bot:
-  token: "your_bot_token_here"
-  admin_chat: "123456789"
