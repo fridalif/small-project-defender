@@ -17,6 +17,7 @@ pub struct HashScanerConfig {
 #[derive(Debug,Deserialize)]
 pub struct SSHDetectorConfig {
     pub on: bool,
+    pub log_file: String,
 }
 
 impl AppConfig {
