@@ -1,8 +1,10 @@
 use inotify::{Inotify, WatchMask};
 use regex::Regex;
 use crate::prelude::*;
+use std::fs::OpenOptions;
+use std::io::{self, BufRead, BufReader};
 
-fn ssh_detector(config: Arc<AppConfig>, tx: mpsc::Sender<HashMap<String, String>>) {
+fn ssh_auth_log_watcher(config: Arc<AppConfig>, tx: mpsc::Sender<HashMap<String, String>>) {
     let mut inotify = Inotify::init()?;
 
     inotify.watches().add(
@@ -14,6 +16,30 @@ fn ssh_detector(config: Arc<AppConfig>, tx: mpsc::Sender<HashMap<String, String>
     let re = Regex::new(r"sshd\[(\d+)\].*Accepted.*for (\w+) from ([\d\.]+)").unwrap();
 
     loop {
-        let events = inotify.read_events(&mut buffer).unwrap();
+        let events = inotify.read_events_blocking(&mut buffer)?;
+        
+        for _event in events {
+            let file = OpenOptions::new().read(true).open(log_path)?;
+            let reader = BufReader::new(file);
+            let mut alerts_map = HashMap<String, String>::new();
+            for line in reader.lines() {
+                let line = line?;
+                
+                if let Some(captures) = re.captures(&line) {
+                    let pid = captures.get(1).unwrap().as_str();
+                    let user = captures.get(2).unwrap().as_str();
+                    let ip = captures.get(3).unwrap().as_str();
+                    
+                    alerts_map.insert("ssh_detector".to_string(), format!("Новое SSH-подключение: Пользователь: {}, IP: {}, PID: {}", user, ip, pid));
+                }
+                
+            }
+
+            if len(alerts_map) != 0 {
+                let mut response_map = HashMap<String, HashMap<String, String>>::new();
+                response_map.insert("ssh_detector".to_string(), alerts_map);
+                tx.send(response_map).unwrap();
+            }
+        }
     }
 }
