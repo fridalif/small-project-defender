@@ -62,7 +62,7 @@ pub fn init_origins_hash_scaner(config: Arc<AppConfig>) -> HashMap<String, Strin
     return origins;
 }
 
-pub fn schedule_hash_scaner(origins: HashMap<String, String>, config: Arc<AppConfig>, tx: mpsc::Sender<HashMap<String, String>>) {
+pub fn schedule_hash_scaner(origins: HashMap<String, String>, config: Arc<AppConfig>, tx: mpsc::Sender<HashMap<String, HashMap<String, String>>) {
     let mut exceptions = config.hash_scaner.exceptions.clone();
     let dirs = config.hash_scaner.directories.clone();
     let mut new_hashes = origins.clone();
@@ -73,17 +73,19 @@ pub fn schedule_hash_scaner(origins: HashMap<String, String>, config: Arc<AppCon
         for dir in dirs.iter() {
             (new_hashes, exceptions) = scan_directory(new_hashes, dir.as_str(), exceptions)
         }
-        let mut response_map = HashMap<String, String>(); 
+        let mut alerts_map = HashMap<String, String>::new(); 
         for key in new_hashes.keys() {
             if !origins.contains_key(key) {
-                response_map.insert(key.to_string(), format!("Detected new file: {}", new_hashes.get(key).unwrap()));
+                alerts_map.insert(key.to_string(), format!("Detected new file: {}", new_hashes.get(key).unwrap()));
                 continue;
             }
             if origins.get(key).unwrap() != new_hashes.get(key).unwrap() {
-                response_map.insert(key.to_string(), format!("Detected modified file: {}", new_hashes.get(key).unwrap()));
+                alerts_map.insert(key.to_string(), format!("Detected modified file: {}", new_hashes.get(key).unwrap()));
                 continue;
             }
-            if len(response_map) != 0 {
+            if len(alerts_map) != 0 {
+                let mut response_map = HashMap<String, HashMap<String, String>>::new();
+                response_map.insert("hash_scaner".to_string(), alerts_map);
                 tx.send(response_map).unwrap();
             }
         }
