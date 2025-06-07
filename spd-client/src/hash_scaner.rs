@@ -62,7 +62,7 @@ pub fn init_origins_hash_scaner(config: Arc<AppConfig>) -> HashMap<String, Strin
     return origins;
 }
 
-pub fn schedule_hash_scaner(origins: HashMap<String, String>, config: Arc<AppConfig>) {
+pub fn schedule_hash_scaner(origins: HashMap<String, String>, config: Arc<AppConfig>, tx: mpsc::Sender<String>) {
     let mut exceptions = config.hash_scaner.exceptions.clone();
     let dirs = config.hash_scaner.directories.clone();
     let mut new_hashes = origins.clone();
