@@ -6,4 +6,6 @@ hash_scaner:
   exceptions:
     - "*/etc"
     - "*/target"
-  cooldown: 60
+  cooldown: 300
+ssh_detector:
+  on: true
