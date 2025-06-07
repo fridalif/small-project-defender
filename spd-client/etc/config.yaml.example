@@ -9,4 +9,7 @@ hash_scaner:
   cooldown: 300
 ssh_detector:
   on: true
-  log_file: "/var/log/auth.log"
+  check_auth: true,
+  log_file: "/var/log/auth.log",
+  check_journalctl: true,
+  journalctl_cooldown: 300,

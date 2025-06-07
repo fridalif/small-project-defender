@@ -17,7 +17,10 @@ pub struct HashScanerConfig {
 #[derive(Debug,Deserialize)]
 pub struct SSHDetectorConfig {
     pub on: bool,
+    pub check_auth: bool,
     pub log_file: String,
+    pub check_journalctl: bool,
+    pub journalctl_cooldown: u64,
 }
 
 impl AppConfig {
