@@ -16,10 +16,9 @@ pub struct HashScanerConfig {
 
 #[derive(Debug,Deserialize)]
 pub struct SSHDetectorConfig {
-    pub on: bool,
-    pub check_auth: bool,
+    pub check_auth_on: bool,
     pub log_file: String,
-    pub check_journalctl: bool,
+    pub check_journalctl_on: bool,
     pub journalctl_cooldown: u64,
 }
 
