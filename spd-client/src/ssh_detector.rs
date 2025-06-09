@@ -21,7 +21,7 @@ fn ssh_auth_log_watcher(config: Arc<AppConfig>, tx: mpsc::Sender<HashMap<String,
         for _event in events {
             let file = OpenOptions::new().read(true).open(log_path)?;
             let reader = BufReader::new(file);
-            let mut alerts_map = HashMap<String, String>::new();
+            let mut alerts_map = HashMap::new();
             for line in reader.lines() {
                 let line = line?;
                 
@@ -36,7 +36,7 @@ fn ssh_auth_log_watcher(config: Arc<AppConfig>, tx: mpsc::Sender<HashMap<String,
             }
 
             if len(alerts_map) != 0 {
-                let mut response_map = HashMap<String, HashMap<String, String>>::new();
+                let mut response_map = HashMap::new();
                 response_map.insert("ssh_detector".to_string(), alerts_map);
                 tx.send(response_map).unwrap();
             }
