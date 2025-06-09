@@ -14,7 +14,7 @@ pub fn ssh_auth_log_watcher(config: Arc<AppConfig>, tx: mpsc::Sender<HashMap<Str
         WatchMask::MODIFY,
     ).unwrap();
 
-    let mut buffer = [0,1024];
+    let mut buffer = [0u8,255];
     let re = Regex::new(r"sshd\[(\d+)\].*Accepted.*for (\w+) from ([\d\.]+)").unwrap();
 
     loop {
