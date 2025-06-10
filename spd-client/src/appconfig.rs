@@ -3,7 +3,8 @@ use serde::Deserialize;
 #[derive(Debug, Deserialize)]
 pub struct AppConfig {
     pub hash_scaner: HashScanerConfig,
-    pub ssh_detector: SSHDetectorConfig
+    pub ssh_detector: SSHDetectorConfig,
+    pub port_detector: PortDetectorConfig
 }
 
 #[derive(Debug,Deserialize)]
@@ -20,6 +21,12 @@ pub struct SSHDetectorConfig {
     pub log_file: String,
     pub check_journalctl_on: bool,
     pub journalctl_cooldown: u64,
+}
+
+#[derive(Debug,Deserialize)]
+pub struct PortDetectorConfig {
+    pub on: bool,
+    pub legit_ports: Vec<u16>,
 }
 
 impl AppConfig {
