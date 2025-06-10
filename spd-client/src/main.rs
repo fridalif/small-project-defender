@@ -23,6 +23,11 @@ fn main() -> Result<(), Box<dyn std::error::Error>>{
         let tx = tx.clone();
         thread::spawn(move || ssh_detector::ssh_auth_log_watcher(std::sync::Arc::clone(&config_clone), tx.clone()));
     }
+    if config.ssh_detector.check_journalctl_on {
+        let config_clone = std::sync::Arc::clone(&config);
+        let tx = tx.clone();
+        thread::spawn(move || ssh_detector::journalctl_watcher(std::sync::Arc::clone(&config_clone), tx.clone()));
+    }
     for message in rx {
         println!("{}", message.keys().next().unwrap());
     }
