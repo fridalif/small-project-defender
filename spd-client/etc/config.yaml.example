@@ -6,4 +6,10 @@ hash_scaner:
   exceptions:
     - "*/etc"
     - "*/target"
-  cooldown: 60
+  cooldown: 300
+ssh_detector:
+  on: true
+  check_auth: true,
+  log_file: "/var/log/auth.log",
+  check_journalctl: true,
+  journalctl_cooldown: 300,
