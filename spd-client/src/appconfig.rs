@@ -26,7 +26,8 @@ pub struct SSHDetectorConfig {
 #[derive(Debug,Deserialize)]
 pub struct PortDetectorConfig {
     pub on: bool,
-    pub legit_ports: Vec<u16>,
+    pub legit_ports: Vec<String>,
+    pub cooldown: u64
 }
 
 impl AppConfig {
