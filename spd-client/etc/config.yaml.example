@@ -22,5 +22,5 @@ port_detector:
 socket:
   host: "127.0.0.1"
   port: 54321
-  init_secret: secret_key_for_connect_and_initial_cryptography
+  init_secret: "secret_key_for_connect_and_initial_cryptography"
   

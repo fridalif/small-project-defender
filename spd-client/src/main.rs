@@ -2,23 +2,26 @@ mod appconfig;
 mod ssh_detector;
 mod hash_scaner;
 mod port_detector;
+mod connection;
 mod prelude {
     pub use crate::appconfig::AppConfig;
 }
 
-use std::sync::mpsc;
+use std::sync::{mpsc, Arc, Mutex};
+use std::collections::HashMap;
 use std::thread;
 use crate::prelude::*;
-use std::sync::Arc;
 
 fn main() -> Result<(), Box<dyn std::error::Error>>{
     let config = Arc::new(AppConfig::new("../etc/config.yaml".to_string())?);
     let (tx, rx) = mpsc::channel();
+    let mut origins_hash_scaner = Arc::new(Mutex::new(HashMap::new()));
     if config.hash_scaner.on {
         let config_clone = std::sync::Arc::clone(&config);
-        let origins_hash_scaner = hash_scaner::init_origins_hash_scaner(std::sync::Arc::clone(&config_clone));
+        origins_hash_scaner = hash_scaner::init_origins_hash_scaner(std::sync::Arc::clone(&config_clone));
+        let origins_hash_scaner = std::sync::Arc::clone(&origins_hash_scaner);
         let tx = tx.clone();
-        thread::spawn(move || hash_scaner::schedule_hash_scaner(origins_hash_scaner, std::sync::Arc::clone(&config_clone), tx.clone()));
+        thread::spawn(move || hash_scaner::schedule_hash_scaner(std::sync::Arc::clone(&origins_hash_scaner), std::sync::Arc::clone(&config_clone), tx.clone()));
     }
     if config.ssh_detector.check_auth_on {
         let config_clone = std::sync::Arc::clone(&config);
@@ -35,8 +38,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>>{
         let tx = tx.clone();
         thread::spawn(move || port_detector::port_detector(std::sync::Arc::clone(&config_clone), tx.clone()));
     }
-    for message in rx {
-        println!("{}", message.keys().next().unwrap());
+    {
+        let origins_hash_scaner = std::sync::Arc::clone(&origins_hash_scaner);
+        let config_clone = std::sync::Arc::clone(&config);
+        thread::spawn(move || connection::serve(std::sync::Arc::clone(&config_clone), rx, std::sync::Arc::clone(&origins_hash_scaner)));
     }
 
     Ok(())  
