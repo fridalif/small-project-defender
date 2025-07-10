@@ -10,6 +10,7 @@ use std::sync::mpsc;
 use std::thread;
 use crate::prelude::*;
 use std::sync::Arc;
+
 fn main() -> Result<(), Box<dyn std::error::Error>>{
     let config = Arc::new(AppConfig::new("../etc/config.yaml".to_string())?);
     let (tx, rx) = mpsc::channel();
