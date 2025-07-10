@@ -54,8 +54,8 @@ fn scan_directory(hash_map: HashMap<String, String>, path: &str, exceptions: Vec
     return (hash_map, exceptions);
 }
 
-pub fn init_origins_hash_scaner(config: Arc<AppConfig>) -> Arc<Mutex<HashMap<String, String>>> {
-    let mut origins: HashMap<String, String> = HashMap::new();
+pub fn init_origins_hash_scaner(config: Arc<AppConfig>, origins: Arc<Mutex<HashMap<String, String>>>) -> Arc<Mutex<HashMap<String, String>>> {
+    let mut origins_map: HashMap<String, String> = HashMap::new();
     let mut exceptions = config.hash_scaner.exceptions.clone();
     for dir in config.hash_scaner.directories.clone() {
         (origins, exceptions) = scan_directory(origins, &dir, exceptions);
