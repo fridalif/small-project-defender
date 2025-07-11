@@ -6,6 +6,7 @@ mod connection;
 mod prelude {
     pub use crate::appconfig::AppConfig;
 }
+mod cryptography;
 
 use std::sync::{mpsc, Arc}; //Mutex};
 //use std::collections::HashMap;
