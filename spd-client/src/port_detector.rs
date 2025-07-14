@@ -4,7 +4,7 @@ use std::process::Command;
 use std::collections::HashMap;
 use std::str;
 
-pub fn port_detector(config: Arc<AppConfig>, tx: mpsc::Sender<HashMap<String, HashMap<String, String>>>) {
+pub fn port_detector(config: Arc<AppConfig>, tx: mpsc::Sender<HashMap<String, String>>) {
     loop {
         let temp_cooldown = config.port_detector.cooldown;
         let random_seconds = rand::random_range(0..temp_cooldown);
@@ -33,11 +33,11 @@ pub fn port_detector(config: Arc<AppConfig>, tx: mpsc::Sender<HashMap<String, Ha
         let mut alerts_map = HashMap::new();
         for port in ports {
             if !config.port_detector.legit_ports.contains(&port) {
-                alerts_map.insert("port_detector".to_string(), format!("Detected not legit port: {}", port));
+                alerts_map.insert("info".to_string(), format!("Detected not legit port: {}", port));
             }
         }
         let mut response_map = HashMap::new();
         response_map.insert("port_detector".to_string(), alerts_map);
-        tx.send(response_map).unwrap();
+        tx.send(response_map).unwrap_or_default();
     }
 }
