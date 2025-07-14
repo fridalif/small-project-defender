@@ -81,13 +81,11 @@ pub fn journalctl_watcher(config: Arc<AppConfig>, tx: mpsc::Sender<HashMap<Strin
                             .nth(1)
                             .unwrap_or(&"unknown");
     
-                        // Извлекаем IP (слово после "from")
                         let ip = parts.iter()
                             .skip_while(|&&part| part != "from")
                             .nth(1)
                             .unwrap_or(&"unknown");
     
-                        // Формируем строку в требуемом формате
                         let alert = format!("Новое SSH-подключение: Пользователь: {}, IP: {}, PID: {}", user, ip, pid);
                         alerts_map.insert("info".to_string(), alert);
                     }
