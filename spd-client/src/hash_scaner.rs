@@ -1,6 +1,6 @@
 use sha2::{Digest, Sha256};
 use std::fs::{self, File};
-use std::sync::Arc;
+use std::sync::{Arc,Mutex};
 use std::io::prelude::*;
 use std::collections::{HashMap};
 use std::path::Path;
@@ -54,33 +54,35 @@ fn scan_directory(hash_map: HashMap<String, String>, path: &str, exceptions: Vec
     return (hash_map, exceptions);
 }
 
-pub fn init_origins_hash_scaner(config: Arc<AppConfig>) -> HashMap<String, String> {
-    let mut origins: HashMap<String, String> = HashMap::new();
+pub fn init_origins_hash_scaner(config: Arc<AppConfig>, origins: Arc<Mutex<HashMap<String, String>>>) -> Arc<Mutex<HashMap<String, String>>> {
+    let mut origins_map: HashMap<String, String> = HashMap::new();
     let mut exceptions = config.hash_scaner.exceptions.clone();
     for dir in config.hash_scaner.directories.clone() {
         (origins, exceptions) = scan_directory(origins, &dir, exceptions);
     }
-    return origins;
+    return Arc::new(Mutex::new(origins));
 }
 
-pub fn schedule_hash_scaner(origins: HashMap<String, String>, config: Arc<AppConfig>, tx: mpsc::Sender<HashMap<String, HashMap<String, String>>>) {
+pub fn schedule_hash_scaner(origins: Arc<Mutex<HashMap<String, String>>>, config: Arc<AppConfig>, tx: mpsc::Sender<HashMap<String, HashMap<String, String>>>) {
     let mut exceptions = config.hash_scaner.exceptions.clone();
     let dirs = config.hash_scaner.directories.clone();
-    let mut new_hashes = origins.clone();
+
     loop {
         let temp_cooldown = config.hash_scaner.cooldown;
         let random_seconds = rand::random_range(0..temp_cooldown);
         std::thread::sleep(std::time::Duration::from_secs(random_seconds));
+
+        let mut new_hashes = origins.lock().unwrap().clone();
         for dir in dirs.iter() {
             (new_hashes, exceptions) = scan_directory(new_hashes, dir.as_str(), exceptions);
         }
         let mut alerts_map =  HashMap::new(); 
         for key in new_hashes.keys() {
-            if !origins.contains_key(key) {
+            if !origins.lock().unwrap().contains_key(key) {
                 alerts_map.insert(key.to_string(), format!("Detected new file: {}", new_hashes.get(key).unwrap()));
                 continue;
             }
-            if origins.get(key).unwrap() != new_hashes.get(key).unwrap() {
+            if origins.lock().unwrap().get(key).unwrap() != new_hashes.get(key).unwrap() {
                 alerts_map.insert(key.to_string(), format!("Detected modified file: {}", new_hashes.get(key).unwrap()));
                 continue;
             }
