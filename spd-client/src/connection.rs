@@ -6,7 +6,7 @@ use std::net::TcpStream;
 
 fn serve_tcp_client(config: Arc<AppConfig>, rx: mpsc::Receiver<HashMap<String, HashMap<String, String>>>) {
     let mut connected = false;
-    let mut stream  = match TcpStream::connect(format!("{}:{}", config.socket.host, config.socket.port)) {
+    let mut stream  = match TcpStream::connect_timeout(format!("{}:{}", config.socket.host, config.socket.port), Duration::from_secs(5)) {
         Ok(stream) => {
             connected = true;
             println!("Connected to {}", format!("{}:{}", config.socket.host, config.socket.port));
@@ -19,7 +19,17 @@ fn serve_tcp_client(config: Arc<AppConfig>, rx: mpsc::Receiver<HashMap<String, H
         }
     };
     loop {
-        
+        match rx.recv_timeout(Duration::from_secs(5)) {
+            Ok(message) => { 
+
+            },
+            Err(mpsc::RecvTimeoutError::Timeout) => { 
+                continue; 
+            },
+            Err(mpsc::RecvTimeoutError::Disconnected) => {
+                break; 
+            }
+        }
     }
 }
 

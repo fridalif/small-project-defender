@@ -36,6 +36,7 @@ pub struct SocketConfig {
     pub host: String,
     pub port: u16,
     pub init_secret: String,
+    pub spare_log_file: String,
 }
 
 impl AppConfig {
