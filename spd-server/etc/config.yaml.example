@@ -1,0 +1,4 @@
+server_settings:
+    ip: "tcp_server_ip"
+    port: tcp_server_port
+    init_secret: "secret_key_for_clients"
